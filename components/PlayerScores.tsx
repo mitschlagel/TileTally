@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { Player } from '../types/game';
 
 interface PlayerScoresProps {
@@ -41,7 +42,7 @@ export function PlayerScores({ players, currentPlayerIndex }: PlayerScoresProps)
                 <Text style={styles.playerScore}>{player.score} pts</Text>
                 {isLeader && player.score > 0 && (
                   <View style={styles.leaderBadge}>
-                    <Text style={styles.leaderBadgeText}>👑</Text>
+                    <FontAwesome5 name="crown" size={10} color="#FFD700" />
                   </View>
                 )}
               </View>
@@ -124,8 +125,8 @@ const styles = StyleSheet.create({
   },
   leaderBadge: {
     position: 'absolute',
-    top: -5,
-    right: -5,
+    top: 2,
+    right: 2,
   },
   leaderBadgeText: {
     fontSize: 16,
