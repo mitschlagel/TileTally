@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
+    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -10,7 +11,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { LetterScoreGuide } from '../components/LetterScoreGuide';
 import { PlayerScores } from '../components/PlayerScores';
 import { useGameStorage } from '../hooks/useGameStorage';
 import { CrossWord, Game, Turn } from '../types/game';
@@ -80,7 +80,7 @@ export default function GameScreen() {
     saveGame(finalGame);
     setGame(finalGame);
     
-    // Reset form
+    // Reset form and close modal
     setWord('');
     setLetterMultipliers({});
     setWordMultipliers({});
@@ -137,36 +137,6 @@ export default function GameScreen() {
       ...prev,
       [position]: prev[position] === multiplier ? undefined : multiplier,
     }));
-  };
-
-  const renderTurn = ({ item }: { item: Turn }) => {
-    const player = game?.players.find(p => p.id === item.playerId);
-    
-    return (
-      <View style={styles.turnItem}>
-        <View style={styles.turnHeader}>
-          <View style={styles.turnPlayerInfo}>
-            <View style={[styles.playerColor, { backgroundColor: player?.color || '#ccc' }]} />
-            <Text style={styles.turnPlayerName}>{player?.name || 'Unknown'}</Text>
-          </View>
-          <Text style={styles.turnScore}>{item.score} pts</Text>
-        </View>
-        <Text style={styles.turnWord}>{item.word}</Text>
-        <Text style={styles.turnTime}>
-          {new Date(item.timestamp).toLocaleTimeString()}
-        </Text>
-        {item.crossWords.length > 0 && (
-          <View style={styles.crossWordsContainer}>
-            <Text style={styles.crossWordsLabel}>Cross words:</Text>
-            {item.crossWords.map((cw, index) => (
-              <Text key={index} style={styles.crossWord}>
-                {cw.word} ({cw.score} pts)
-              </Text>
-            ))}
-          </View>
-        )}
-      </View>
-    );
   };
 
   const renderLetterInput = () => {
@@ -276,61 +246,86 @@ export default function GameScreen() {
       <View style={styles.actions}>
         <TouchableOpacity
           style={styles.addTurnButton}
-          onPress={() => setShowAddTurn(!showAddTurn)}
+          onPress={() => setShowAddTurn(true)}
         >
-          <Text style={styles.addTurnButtonText}>
-            {showAddTurn ? 'Cancel' : 'Add Turn'}
-          </Text>
+          <Text style={styles.addTurnButtonText}>Add Turn</Text>
         </TouchableOpacity>
       </View>
 
-      {showAddTurn && (
-        <ScrollView style={styles.addTurnForm}>
-          {renderLetterInput()}
-          
-          <View style={styles.crossWordsSection}>
-            <Text style={styles.inputLabel}>Cross Words:</Text>
-            {crossWords.map((cw, index) => (
-              <View key={index} style={styles.crossWordItem}>
-                <Text style={styles.crossWordText}>{cw.word} ({cw.score} pts)</Text>
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removeCrossWord(index)}
-                >
-                  <Text style={styles.removeButtonText}>×</Text>
-                </TouchableOpacity>
+      <View style={styles.wordsSection}>
+        <Text style={styles.sectionTitle}>History</Text>
+        <View style={styles.wordsContainer}>
+          {game.players.map((player) => (
+            <View key={player.id} style={styles.playerColumn}>
+              <View style={styles.playerColumnHeader}>
+                <View style={[styles.playerColor, { backgroundColor: player.color }]} />
+                <Text style={styles.playerColumnName}>{player.name}</Text>
               </View>
-            ))}
-            <TouchableOpacity style={styles.addCrossWordButton} onPress={addCrossWord}>
-              <Text style={styles.addCrossWordButtonText}>+ Add Cross Word</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.submitButton} onPress={addTurn}>
-            <Text style={styles.submitButtonText}>Add Turn</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      )}
-
-      <View style={styles.turnsSection}>
-        <Text style={styles.sectionTitle}>Turns ({game.turns.length})</Text>
-        {game.turns.length === 0 ? (
-          <View style={styles.emptyTurns}>
-            <Text style={styles.emptyTurnsText}>No turns yet</Text>
-            <Text style={styles.emptyTurnsSubtext}>Add your first turn to start scoring!</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={game.turns}
-            renderItem={renderTurn}
-            keyExtractor={(item) => item.id}
-            style={styles.turnsList}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+              <View style={styles.wordsList}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {game.turns
+                    .filter(turn => turn.playerId === player.id)
+                    .map((turn, index) => (
+                      <View key={turn.id} style={styles.wordItem}>
+                        <Text style={styles.wordText} numberOfLines={1}>{turn.word}</Text>
+                        <Text style={styles.wordScore}>{turn.score} pts</Text>
+                      </View>
+                    ))}
+                  {game.turns.filter(turn => turn.playerId === player.id).length === 0 && (
+                    <Text style={styles.noWordsText}>No words yet</Text>
+                  )}
+                </ScrollView>
+              </View>
+            </View>
+          ))}
+        </View>
       </View>
 
-      <LetterScoreGuide />
+      <Modal
+        visible={showAddTurn}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowAddTurn(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowAddTurn(false)}
+            >
+              <Text style={styles.closeButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Add Turn</Text>
+            <View style={styles.placeholder} />
+          </View>
+          
+          <ScrollView style={styles.modalContent}>
+            {renderLetterInput()}
+            
+            <View style={styles.crossWordsSection}>
+              <Text style={styles.inputLabel}>Cross Words:</Text>
+              {crossWords.map((cw, index) => (
+                <View key={index} style={styles.crossWordItem}>
+                  <Text style={styles.crossWordText}>{cw.word} ({cw.score} pts)</Text>
+                  <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={() => removeCrossWord(index)}
+                  >
+                    <Text style={styles.removeButtonText}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <TouchableOpacity style={styles.addCrossWordButton} onPress={addCrossWord}>
+                <Text style={styles.addCrossWordButtonText}>+ Add Cross Word</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.submitButton} onPress={addTurn}>
+              <Text style={styles.submitButtonText}>Add Turn</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -376,12 +371,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  addTurnForm: {
+  modalContainer: {
+    flex: 1,
     backgroundColor: 'white',
-    borderRadius: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#f8f8f8',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+    textAlign: 'center',
+  },
+  closeButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    minWidth: 60,
+  },
+  closeButtonText: {
+    color: '#2E7D32',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalContent: {
     padding: 20,
+  },
+  letterInputContainer: {
     marginBottom: 20,
-    maxHeight: 400,
   },
   currentPlayerInfo: {
     flexDirection: 'row',
@@ -401,9 +425,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-  },
-  letterInputContainer: {
-    marginBottom: 20,
   },
   inputLabel: {
     fontSize: 16,
@@ -515,8 +536,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  turnsSection: {
+  placeholder: {
+    minWidth: 60,
+  },
+  wordsSection: {
     flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   sectionTitle: {
     fontSize: 18,
@@ -524,80 +557,59 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 15,
   },
-  turnsList: {
+  wordsContainer: {
+    flexDirection: 'row',
     flex: 1,
   },
-  turnItem: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
+  playerColumn: {
+    flex: 1,
+    marginHorizontal: 5,
   },
-  turnHeader: {
+  playerColumnHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  playerColumnName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 6,
+  },
+  wordsList: {
+    flex: 1,
+    maxHeight: 200,
+  },
+  wordItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 4,
+    marginBottom: 3,
   },
-  turnPlayerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  turnPlayerName: {
-    fontSize: 14,
-    fontWeight: 'bold',
+  wordText: {
+    fontSize: 12,
+    fontWeight: '600',
     color: '#333',
+    flex: 1,
   },
-  turnWord: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  turnScore: {
-    fontSize: 18,
+  wordScore: {
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#2E7D32',
+    marginLeft: 4,
   },
-  turnTime: {
+  noWordsText: {
     fontSize: 12,
-    color: '#666',
-    marginBottom: 5,
-  },
-  crossWordsContainer: {
-    marginTop: 8,
-  },
-  crossWordsLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#666',
-    marginBottom: 4,
-  },
-  crossWord: {
-    fontSize: 12,
-    color: '#666',
-    marginLeft: 10,
-  },
-  emptyTurns: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 50,
-  },
-  emptyTurnsText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#666',
-    marginBottom: 10,
-  },
-  emptyTurnsSubtext: {
-    fontSize: 14,
     color: '#999',
     textAlign: 'center',
+    fontStyle: 'italic',
+    paddingVertical: 10,
   },
 }); 

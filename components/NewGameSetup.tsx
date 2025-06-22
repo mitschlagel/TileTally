@@ -23,7 +23,7 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
   const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
 
   const updatePlayerCount = (count: number) => {
-    if (count >= 2 && count <= 8) {
+    if (count >= 2 && count <= 4) {
       setPlayerCount(count);
       setPlayers(createPlayers(count));
     }
@@ -68,82 +68,106 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>New Game Setup</Text>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Game Name</Text>
-        <TextInput
-          style={styles.gameNameInput}
-          value={gameName}
-          onChangeText={setGameName}
-          placeholder="Enter game name"
-          maxLength={30}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Number of Players</Text>
-        <View style={styles.playerCountContainer}>
-          {[2, 3, 4, 5, 6, 7, 8].map((count) => (
-            <TouchableOpacity
-              key={count}
-              style={[
-                styles.playerCountButton,
-                playerCount === count && styles.selectedPlayerCount,
-              ]}
-              onPress={() => updatePlayerCount(count)}
-            >
-              <Text
-                style={[
-                  styles.playerCountText,
-                  playerCount === count && styles.selectedPlayerCountText,
-                ]}
-              >
-                {count}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Player Names</Text>
-        <ScrollView style={styles.playersList} showsVerticalScrollIndicator={false}>
-          {players.map((player, index) => renderPlayerInput(player, index))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+    <View style={styles.modalContainer}>
+      <View style={styles.modalHeader}>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={onCancel}
+        >
+          <Text style={styles.closeButtonText}>Cancel</Text>
         </TouchableOpacity>
+        <Text style={styles.modalTitle}>New Game</Text>
+        <View style={styles.placeholder} />
+      </View>
+      
+      <ScrollView style={styles.modalContent}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Game Name</Text>
+          <TextInput
+            style={styles.gameNameInput}
+            value={gameName}
+            onChangeText={setGameName}
+            placeholder="Enter game name"
+            maxLength={30}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Number of Players</Text>
+          <View style={styles.playerCountContainer}>
+            {[2, 3, 4].map((count) => (
+              <TouchableOpacity
+                key={count}
+                style={[
+                  styles.playerCountButton,
+                  playerCount === count && styles.selectedPlayerCount,
+                ]}
+                onPress={() => updatePlayerCount(count)}
+              >
+                <Text
+                  style={[
+                    styles.playerCountText,
+                    playerCount === count && styles.selectedPlayerCountText,
+                  ]}
+                >
+                  {count}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Player Names</Text>
+          <View style={styles.playersList}>
+            {players.map((player, index) => renderPlayerInput(player, index))}
+          </View>
+        </View>
+
         <TouchableOpacity style={styles.createButton} onPress={handleCreateGame}>
           <Text style={styles.createButtonText}>Create Game</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  modalContainer: {
+    flex: 1,
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    margin: 20,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  title: {
-    fontSize: 24,
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#f8f8f8',
+  },
+  closeButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    minWidth: 60,
+  },
+  closeButtonText: {
+    color: '#2E7D32',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+    flex: 1,
     textAlign: 'center',
-    marginBottom: 20,
+  },
+  placeholder: {
+    minWidth: 60,
+  },
+  modalContent: {
+    padding: 20,
   },
   section: {
     marginBottom: 20,
@@ -209,31 +233,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   createButton: {
-    flex: 1,
     backgroundColor: '#2E7D32',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginLeft: 10,
+    marginTop: 20,
   },
   createButtonText: {
     color: 'white',

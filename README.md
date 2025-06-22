@@ -4,7 +4,7 @@ A React Native app built with Expo for tracking and scoring word games with mult
 
 ## Features
 
-- **Multi-Player Support**: Track scores for 2-8 players in each game
+- **Multi-Player Support**: Track scores for 2-4 players in each game
 - **Game Management**: Start new games and continue existing ones
 - **Score Calculation**: Automatically calculate scores based on letter values
 - **Multipliers**: Support for letter (2x, 3x) and word (2x, 3x) multipliers
@@ -33,7 +33,7 @@ A React Native app built with Expo for tracking and scoring word games with mult
 ### Starting a New Game
 1. Tap "Start New Game" on the home screen
 2. Enter a name for your game
-3. Select the number of players (2-8)
+3. Select the number of players (2-4)
 4. Optionally customize player names
 5. Tap "Create Game" to start
 

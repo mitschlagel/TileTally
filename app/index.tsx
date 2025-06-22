@@ -131,15 +131,13 @@ export default function HomeScreen() {
       <Modal
         visible={showNewGameModal}
         animationType="slide"
-        transparent={true}
+        presentationStyle="pageSheet"
         onRequestClose={() => setShowNewGameModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <NewGameSetup
-            onGameCreated={handleCreateGame}
-            onCancel={() => setShowNewGameModal(false)}
-          />
-        </View>
+        <NewGameSetup
+          onGameCreated={handleCreateGame}
+          onCancel={() => setShowNewGameModal(false)}
+        />
       </Modal>
     </View>
   );
@@ -209,6 +207,7 @@ const styles = StyleSheet.create({
   gameItem: {
     backgroundColor: 'white',
     padding: 20,
+    paddingBottom: 30,
     borderRadius: 10,
     marginBottom: 10,
     elevation: 2,
@@ -253,8 +252,8 @@ const styles = StyleSheet.create({
   },
   activeBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    bottom: 4,
+    right: 16,
     backgroundColor: '#2E7D32',
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -281,11 +280,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     textAlign: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 }); 

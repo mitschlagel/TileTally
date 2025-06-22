@@ -62,8 +62,7 @@ export function generatePlayerId(): string {
 export function createPlayers(playerCount: number): Player[] {
   const players: Player[] = [];
   const PLAYER_COLORS = [
-    '#2E7D32', '#1976D2', '#D32F2F', '#FF8F00', 
-    '#7B1FA2', '#C2185B', '#388E3C', '#1565C0'
+    '#2E7D32', '#1976D2', '#D32F2F', '#FF8F00'
   ];
 
   for (let i = 0; i < playerCount; i++) {
