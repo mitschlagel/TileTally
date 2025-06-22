@@ -1,8 +1,7 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
-    FlatList,
     Modal,
     ScrollView,
     StyleSheet,
@@ -18,7 +17,6 @@ import { calculateTurnScore, generateTurnId, getNextPlayerIndex, updatePlayerSco
 
 export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const { games, saveGame } = useGameStorage();
   
   const [game, setGame] = useState<Game | null>(null);
@@ -243,15 +241,6 @@ export default function GameScreen() {
 
       <PlayerScores players={game.players} currentPlayerIndex={game.currentPlayerIndex} />
 
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.addTurnButton}
-          onPress={() => setShowAddTurn(true)}
-        >
-          <Text style={styles.addTurnButtonText}>Add Turn</Text>
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.wordsSection}>
         <Text style={styles.sectionTitle}>History</Text>
         <View style={styles.wordsContainer}>
@@ -280,6 +269,13 @@ export default function GameScreen() {
           ))}
         </View>
       </View>
+
+      <TouchableOpacity
+        style={styles.addTurnButton}
+        onPress={() => setShowAddTurn(true)}
+      >
+        <Text style={styles.addTurnButtonText}>Add Turn</Text>
+      </TouchableOpacity>
 
       <Modal
         visible={showAddTurn}
@@ -335,6 +331,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     padding: 20,
+    paddingBottom: 30,
   },
   loadingContainer: {
     flex: 1,
@@ -356,15 +353,18 @@ const styles = StyleSheet.create({
     color: '#2E7D32',
     fontWeight: 'bold',
   },
-  actions: {
-    marginBottom: 20,
-  },
   addTurnButton: {
     backgroundColor: '#2E7D32',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
     alignItems: 'center',
+    marginTop: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   addTurnButtonText: {
     color: 'white',

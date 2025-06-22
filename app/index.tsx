@@ -96,18 +96,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>TileTally</Text>
-        <Text style={styles.subtitle}>Track your word games</Text>
-      </View>
-
-      <TouchableOpacity 
-        style={styles.newGameButton} 
-        onPress={() => setShowNewGameModal(true)}
-      >
-        <Text style={styles.newGameButtonText}>New Game</Text>
-      </TouchableOpacity>
-
       <View style={styles.gamesSection}>
         <Text style={styles.sectionTitle}>Recent Games</Text>
         {safeGames.length === 0 ? (
@@ -127,6 +115,13 @@ export default function HomeScreen() {
           />
         )}
       </View>
+
+      <TouchableOpacity 
+        style={styles.newGameButton} 
+        onPress={() => setShowNewGameModal(true)}
+      >
+        <Text style={styles.newGameButtonText}>New Game</Text>
+      </TouchableOpacity>
 
       <Modal
         visible={showNewGameModal}
@@ -148,6 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     padding: 20,
+    paddingBottom: 30,
   },
   loadingContainer: {
     flex: 1,
@@ -160,27 +156,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2E7D32',
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
   newGameButton: {
     backgroundColor: '#2E7D32',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 30,
+    marginTop: 20,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
