@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { NewGameSetup } from '../components/NewGameSetup';
 import { useGameStorage } from '../hooks/useGameStorage';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { Colors } from '../constants/Colors';
 import { Game, Player } from '../types/game';
 import { generateGameId } from '../utils/scoring';
 
@@ -19,6 +21,8 @@ export default function HomeScreen() {
   const router = useRouter();
   const { games, loading, saveGame, deleteGame } = useGameStorage();
   const [showNewGameModal, setShowNewGameModal] = useState(false);
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
 
   const handleCreateGame = (gameName: string, players: Player[]) => {
     const newGame: Game = {
@@ -59,19 +63,23 @@ export default function HomeScreen() {
 
   const renderGameItem = ({ item }: { item: Game }) => (
     <TouchableOpacity
-      style={[styles.gameItem, item.isActive && styles.activeGameItem]}
+      style={[
+        styles.gameItem, 
+        { backgroundColor: theme.background },
+        item.isActive && styles.activeGameItem
+      ]}
       onPress={() => continueGame(item)}
       onLongPress={() => handleDeleteGame(item)}
     >
       <View style={styles.gameHeader}>
-        <Text style={styles.gameName}>{item.name}</Text>
+        <Text style={[styles.gameName, { color: theme.text }]}>{item.name}</Text>
         <Text style={styles.gameScore}>{item.totalScore} pts</Text>
       </View>
       <View style={styles.gameDetails}>
-        <Text style={styles.gameDate}>
+        <Text style={[styles.gameDate, { color: theme.icon }]}>
           {new Date(item.updatedAt).toLocaleDateString()}
         </Text>
-        <Text style={styles.turnCount}>
+        <Text style={[styles.turnCount, { color: theme.icon }]}>
           {item.players?.length || 0} players • {item.turns?.length || 0} turns
         </Text>
       </View>
@@ -85,9 +93,9 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color="#2E7D32" />
-        <Text style={styles.loadingText}>Loading games...</Text>
+        <Text style={[styles.loadingText, { color: theme.text }]}>Loading games...</Text>
       </View>
     );
   }
@@ -95,13 +103,13 @@ export default function HomeScreen() {
   const safeGames = games || [];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.gamesSection}>
-        <Text style={styles.sectionTitle}>Recent Games</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent Games</Text>
         {safeGames.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No games yet</Text>
-            <Text style={styles.emptyStateSubtext}>
+            <Text style={[styles.emptyStateText, { color: theme.text }]}>No games yet</Text>
+            <Text style={[styles.emptyStateSubtext, { color: theme.icon }]}>
               Start your first game to begin scoring!
             </Text>
           </View>
@@ -141,7 +149,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 20,
     paddingBottom: 30,
   },
@@ -149,12 +156,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
   },
   newGameButton: {
     backgroundColor: '#2E7D32',
@@ -180,7 +185,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 15,
   },
   gamesList: {
@@ -255,12 +259,10 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#666',
     marginBottom: 10,
   },
   emptyStateSubtext: {
     fontSize: 16,
-    color: '#999',
     textAlign: 'center',
   },
 }); 

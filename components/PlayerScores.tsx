@@ -1,6 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { Colors } from '../constants/Colors';
 import { Player } from '../types/game';
 
 interface PlayerScoresProps {
@@ -10,44 +12,43 @@ interface PlayerScoresProps {
 
 export function PlayerScores({ players, currentPlayerIndex }: PlayerScoresProps) {
   const safePlayers = players || [];
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Player Scores</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={styles.playersContainer}>
-          {safePlayers.map((player, index) => {
-            const isCurrentPlayer = index === currentPlayerIndex;
-            const isLeader = player.score > 0 && safePlayers.every(p => p.score <= player.score);
-            
-            return (
-              <View
-                key={player.id}
-                style={[
-                  styles.playerCard,
-                  isCurrentPlayer && styles.currentPlayerCard,
-                ]}
-              >
-                <View style={styles.playerHeader}>
-                  <View style={[styles.playerColor, { backgroundColor: player.color }]} />
-                  <Text style={styles.playerName}>{player.name}</Text>
-                  {isCurrentPlayer && (
-                    <View style={styles.currentIndicator}>
-                      <Text style={styles.currentIndicatorText}>←</Text>
-                    </View>
-                  )}
-                </View>
-                <Text style={styles.playerScore}>{player.score} pts</Text>
-                {isLeader && (
-                  <View style={styles.leaderBadge}>
-                    <FontAwesome5 name="crown" size={10} color="#FFD700" />
-                  </View>
-                )}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.title, { color: theme.text }]}>Player Scores</Text>
+      <View style={styles.playersContainer}>
+        {safePlayers.map((player, index) => {
+          const isCurrentPlayer = index === currentPlayerIndex;
+          const isLeader = player.score > 0 && safePlayers.every(p => p.score <= player.score);
+          
+          return (
+            <View
+              key={player.id}
+              style={[
+                styles.playerCard,
+                { backgroundColor: theme.background === '#fff' ? '#f9f9f9' : '#2a2a2a' },
+                isCurrentPlayer && styles.currentPlayerCard,
+              ]}
+            >
+              <View style={styles.playerHeader}>
+                <View style={[styles.playerColor, { backgroundColor: player.color }]} />
+                <Text style={[
+                  styles.playerName, 
+                  { color: isCurrentPlayer ? '#1b5e20' : theme.text }
+                ]}>{player.name}</Text>
               </View>
-            );
-          })}
-        </View>
-      </ScrollView>
+              <Text style={styles.playerScore}>{player.score} pts</Text>
+              {isLeader && (
+                <View style={styles.leaderBadge}>
+                  <FontAwesome5 name="crown" size={10} color="#FFD700" />
+                </View>
+              )}
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -72,13 +73,13 @@ const styles = StyleSheet.create({
   },
   playersContainer: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 6,
   },
   playerCard: {
     backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    padding: 12,
-    minWidth: 100,
+    borderRadius: 6,
+    padding: 4,
+    minWidth: 80,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
@@ -90,37 +91,29 @@ const styles = StyleSheet.create({
   playerHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   playerColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 4,
   },
   playerName: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#333',
     flex: 1,
   },
-  currentIndicator: {
-    marginLeft: 4,
-  },
-  currentIndicatorText: {
-    fontSize: 16,
-    color: '#2E7D32',
-    fontWeight: 'bold',
-  },
   playerScore: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#2E7D32',
   },
   leaderBadge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
+    top: -4,
+    right: -4,
   },
   leaderBadgeText: {
     fontSize: 16,

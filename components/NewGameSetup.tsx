@@ -8,6 +8,8 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { Colors } from '../constants/Colors';
 import { Player } from '../types/game';
 import { createPlayers } from '../utils/scoring';
 
@@ -21,6 +23,8 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
   const [gameName, setGameName] = useState('');
   const [players, setPlayers] = useState<Player[]>(createPlayers(2));
   const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
 
   const updatePlayerCount = (count: number) => {
     if (count >= 2 && count <= 4) {
@@ -55,51 +59,58 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
   };
 
   const renderPlayerInput = (player: Player, index: number) => (
-    <View key={player.id} style={styles.playerInputContainer}>
+    <View key={player.id} style={[styles.playerInputContainer, { backgroundColor: theme.background === '#fff' ? '#f9f9f9' : '#2a2a2a' }]}>
       <View style={[styles.playerColorIndicator, { backgroundColor: player.color }]} />
       <TextInput
-        style={styles.playerNameInput}
+        style={[styles.playerNameInput, { color: theme.text }]}
         value={player.name}
         onChangeText={(name) => updatePlayerName(player.id, name)}
         placeholder={`Player ${index + 1}`}
+        placeholderTextColor={theme.icon}
         maxLength={20}
       />
     </View>
   );
 
   return (
-    <View style={styles.modalContainer}>
-      <View style={styles.modalHeader}>
+    <View style={[styles.modalContainer, { backgroundColor: theme.background }]}>
+      <View style={[styles.modalHeader, { backgroundColor: theme.background === '#fff' ? '#f8f8f8' : '#2a2a2a', borderBottomColor: theme.background === '#fff' ? '#e0e0e0' : '#404040' }]}>
         <TouchableOpacity
           style={styles.closeButton}
           onPress={onCancel}
         >
           <Text style={styles.closeButtonText}>Cancel</Text>
         </TouchableOpacity>
-        <Text style={styles.modalTitle}>New Game</Text>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>New Game</Text>
         <View style={styles.placeholder} />
       </View>
       
       <ScrollView style={styles.modalContent}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Game Name</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Game Name</Text>
           <TextInput
-            style={styles.gameNameInput}
+            style={[styles.gameNameInput, { 
+              borderColor: theme.background === '#fff' ? '#ddd' : '#404040',
+              backgroundColor: theme.background,
+              color: theme.text
+            }]}
             value={gameName}
             onChangeText={setGameName}
             placeholder="Enter game name"
+            placeholderTextColor={theme.icon}
             maxLength={30}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Number of Players</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Number of Players</Text>
           <View style={styles.playerCountContainer}>
             {[2, 3, 4].map((count) => (
               <TouchableOpacity
                 key={count}
                 style={[
                   styles.playerCountButton,
+                  { backgroundColor: theme.background === '#fff' ? '#f0f0f0' : '#404040' },
                   playerCount === count && styles.selectedPlayerCount,
                 ]}
                 onPress={() => updatePlayerCount(count)}
@@ -107,6 +118,7 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
                 <Text
                   style={[
                     styles.playerCountText,
+                    { color: theme.text },
                     playerCount === count && styles.selectedPlayerCountText,
                   ]}
                 >
@@ -118,7 +130,7 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Player Names</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Player Names</Text>
           <View style={styles.playersList}>
             {players.map((player, index) => renderPlayerInput(player, index))}
           </View>
@@ -135,7 +147,6 @@ export function NewGameSetup({ onGameCreated, onCancel }: NewGameSetupProps) {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: 'white',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -143,8 +154,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    backgroundColor: '#f8f8f8',
   },
   closeButton: {
     paddingHorizontal: 10,

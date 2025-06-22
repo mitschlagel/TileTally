@@ -1,7 +1,8 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
+    FlatList,
     Modal,
     ScrollView,
     StyleSheet,
@@ -12,12 +13,17 @@ import {
 } from 'react-native';
 import { PlayerScores } from '../components/PlayerScores';
 import { useGameStorage } from '../hooks/useGameStorage';
+import { useColorScheme } from '../hooks/useColorScheme';
+import { Colors } from '../constants/Colors';
 import { CrossWord, Game, Turn } from '../types/game';
 import { calculateTurnScore, generateTurnId, getNextPlayerIndex, updatePlayerScore } from '../utils/scoring';
 
 export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const { games, saveGame } = useGameStorage();
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
   
   const [game, setGame] = useState<Game | null>(null);
   const [word, setWord] = useState('');
@@ -142,77 +148,86 @@ export default function GameScreen() {
     
     return (
       <View style={styles.letterInputContainer}>
-        <View style={styles.currentPlayerInfo}>
+        <View style={[styles.currentPlayerInfo, { backgroundColor: theme.background === '#fff' ? '#f0f8f0' : '#1a2a1a' }]}>
           <View style={[styles.playerColor, { backgroundColor: currentPlayer?.color || '#ccc' }]} />
-          <Text style={styles.currentPlayerText}>
+          <Text style={[styles.currentPlayerText, { color: theme.text }]}>
             {currentPlayer?.name || 'Unknown'}&apos;s turn
           </Text>
         </View>
         
-        <Text style={styles.inputLabel}>Word:</Text>
+        <Text style={[styles.inputLabel, { color: theme.text }]}>Word:</Text>
         <TextInput
-          style={styles.wordInput}
+          style={[styles.wordInput, { 
+            borderColor: theme.background === '#fff' ? '#ddd' : '#404040',
+            backgroundColor: theme.background,
+            color: theme.text
+          }]}
           value={word}
           onChangeText={setWord}
           placeholder="Enter word"
+          placeholderTextColor={theme.icon}
           autoCapitalize="characters"
           maxLength={15}
         />
         
         {word.length > 0 && (
           <View style={styles.multipliersContainer}>
-            <Text style={styles.multipliersLabel}>Letter Multipliers:</Text>
+            <Text style={[styles.multipliersLabel, { color: theme.icon }]}>Letter Multipliers:</Text>
             <View style={styles.multipliersRow}>
               {word.split('').map((letter, index) => (
                 <View key={index} style={styles.letterContainer}>
-                  <Text style={styles.letter}>{letter}</Text>
+                  <Text style={[styles.letter, { color: theme.text }]}>{letter}</Text>
                   <View style={styles.multiplierButtons}>
                     <TouchableOpacity
                       style={[
                         styles.multiplierButton,
+                        { backgroundColor: theme.background === '#fff' ? '#f0f0f0' : '#404040' },
                         letterMultipliers[index] === 2 && styles.activeMultiplier,
                       ]}
                       onPress={() => toggleLetterMultiplier(index, 2)}
                     >
-                      <Text style={styles.multiplierText}>2x</Text>
+                      <Text style={[styles.multiplierText, { color: theme.text }]}>2x</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[
                         styles.multiplierButton,
+                        { backgroundColor: theme.background === '#fff' ? '#f0f0f0' : '#404040' },
                         letterMultipliers[index] === 3 && styles.activeMultiplier,
                       ]}
                       onPress={() => toggleLetterMultiplier(index, 3)}
                     >
-                      <Text style={styles.multiplierText}>3x</Text>
+                      <Text style={[styles.multiplierText, { color: theme.text }]}>3x</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               ))}
             </View>
             
-            <Text style={styles.multipliersLabel}>Word Multipliers:</Text>
+            <Text style={[styles.multipliersLabel, { color: theme.icon }]}>Word Multipliers:</Text>
             <View style={styles.multipliersRow}>
               {word.split('').map((letter, index) => (
                 <View key={index} style={styles.letterContainer}>
-                  <Text style={styles.letter}>{letter}</Text>
+                  <Text style={[styles.letter, { color: theme.text }]}>{letter}</Text>
                   <View style={styles.multiplierButtons}>
                     <TouchableOpacity
                       style={[
                         styles.multiplierButton,
+                        { backgroundColor: theme.background === '#fff' ? '#f0f0f0' : '#404040' },
                         wordMultipliers[index] === 2 && styles.activeMultiplier,
                       ]}
                       onPress={() => toggleWordMultiplier(index, 2)}
                     >
-                      <Text style={styles.multiplierText}>2x</Text>
+                      <Text style={[styles.multiplierText, { color: theme.text }]}>2x</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[
                         styles.multiplierButton,
+                        { backgroundColor: theme.background === '#fff' ? '#f0f0f0' : '#404040' },
                         wordMultipliers[index] === 3 && styles.activeMultiplier,
                       ]}
                       onPress={() => toggleWordMultiplier(index, 3)}
                     >
-                      <Text style={styles.multiplierText}>3x</Text>
+                      <Text style={[styles.multiplierText, { color: theme.text }]}>3x</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -226,42 +241,42 @@ export default function GameScreen() {
 
   if (!game) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading game...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <Text style={[styles.loadingText, { color: theme.text }]}>Loading game...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={styles.gameName}>{game.name}</Text>
+        <Text style={[styles.gameName, { color: theme.text }]}>{game.name}</Text>
         <Text style={styles.totalScore}>Total: {game.totalScore} pts</Text>
       </View>
 
       <PlayerScores players={game.players} currentPlayerIndex={game.currentPlayerIndex} />
 
-      <View style={styles.wordsSection}>
-        <Text style={styles.sectionTitle}>History</Text>
+      <View style={[styles.wordsSection, { backgroundColor: theme.background }]}>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>History</Text>
         <View style={styles.wordsContainer}>
           {game.players.map((player) => (
             <View key={player.id} style={styles.playerColumn}>
               <View style={styles.playerColumnHeader}>
                 <View style={[styles.playerColor, { backgroundColor: player.color }]} />
-                <Text style={styles.playerColumnName}>{player.name}</Text>
+                <Text style={[styles.playerColumnName, { color: theme.text }]}>{player.name}</Text>
               </View>
               <View style={styles.wordsList}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                   {game.turns
                     .filter(turn => turn.playerId === player.id)
                     .map((turn, index) => (
-                      <View key={turn.id} style={styles.wordItem}>
-                        <Text style={styles.wordText} numberOfLines={1}>{turn.word}</Text>
+                      <View key={turn.id} style={[styles.wordItem, { backgroundColor: theme.background === '#fff' ? '#f8f8f8' : '#2a2a2a' }]}>
+                        <Text style={[styles.wordText, { color: theme.text }]} numberOfLines={1}>{turn.word}</Text>
                         <Text style={styles.wordScore}>{turn.score} pts</Text>
                       </View>
                     ))}
                   {game.turns.filter(turn => turn.playerId === player.id).length === 0 && (
-                    <Text style={styles.noWordsText}>No words yet</Text>
+                    <Text style={[styles.noWordsText, { color: theme.icon }]}>No words yet</Text>
                   )}
                 </ScrollView>
               </View>
@@ -283,15 +298,15 @@ export default function GameScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setShowAddTurn(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+        <View style={[styles.modalContainer, { backgroundColor: theme.background }]}>
+          <View style={[styles.modalHeader, { backgroundColor: theme.background === '#fff' ? '#f8f8f8' : '#2a2a2a', borderBottomColor: theme.background === '#fff' ? '#e0e0e0' : '#404040' }]}>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setShowAddTurn(false)}
             >
               <Text style={styles.closeButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Add Turn</Text>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>Add Turn</Text>
             <View style={styles.placeholder} />
           </View>
           
@@ -299,10 +314,10 @@ export default function GameScreen() {
             {renderLetterInput()}
             
             <View style={styles.crossWordsSection}>
-              <Text style={styles.inputLabel}>Cross Words:</Text>
+              <Text style={[styles.inputLabel, { color: theme.text }]}>Cross Words:</Text>
               {crossWords.map((cw, index) => (
-                <View key={index} style={styles.crossWordItem}>
-                  <Text style={styles.crossWordText}>{cw.word} ({cw.score} pts)</Text>
+                <View key={index} style={[styles.crossWordItem, { backgroundColor: theme.background === '#fff' ? '#f9f9f9' : '#2a2a2a' }]}>
+                  <Text style={[styles.crossWordText, { color: theme.text }]}>{cw.word} ({cw.score} pts)</Text>
                   <TouchableOpacity
                     style={styles.removeButton}
                     onPress={() => removeCrossWord(index)}
@@ -311,8 +326,8 @@ export default function GameScreen() {
                   </TouchableOpacity>
                 </View>
               ))}
-              <TouchableOpacity style={styles.addCrossWordButton} onPress={addCrossWord}>
-                <Text style={styles.addCrossWordButtonText}>+ Add Cross Word</Text>
+              <TouchableOpacity style={[styles.addCrossWordButton, { backgroundColor: theme.background === '#fff' ? '#e0e0e0' : '#404040' }]} onPress={addCrossWord}>
+                <Text style={[styles.addCrossWordButtonText, { color: theme.icon }]}>+ Add Cross Word</Text>
               </TouchableOpacity>
             </View>
 
@@ -329,7 +344,6 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 20,
     paddingBottom: 30,
   },
@@ -563,53 +577,58 @@ const styles = StyleSheet.create({
   },
   playerColumn: {
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: 3,
   },
   playerColumnHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
-    paddingBottom: 8,
+    marginBottom: 8,
+    paddingBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
   playerColumnName: {
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#333',
-    marginLeft: 6,
+    marginLeft: 4,
   },
   wordsList: {
     flex: 1,
-    maxHeight: 200,
+    maxHeight: 150,
   },
   wordItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 3,
-    paddingHorizontal: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
     backgroundColor: '#f8f8f8',
-    borderRadius: 4,
-    marginBottom: 3,
+    borderRadius: 3,
+    marginBottom: 2,
   },
   wordText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#333',
     flex: 1,
   },
   wordScore: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#2E7D32',
     marginLeft: 4,
   },
   noWordsText: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#999',
     textAlign: 'center',
     fontStyle: 'italic',
-    paddingVertical: 10,
+    paddingVertical: 8,
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2E7D32',
   },
 }); 
