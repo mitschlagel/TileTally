@@ -10,16 +10,15 @@ interface PlayerScoresProps {
 
 export function PlayerScores({ players, currentPlayerIndex }: PlayerScoresProps) {
   const safePlayers = players || [];
-  const sortedPlayers = [...safePlayers].sort((a, b) => b.score - a.score);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Player Scores</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.playersContainer}>
-          {sortedPlayers.map((player, index) => {
-            const isCurrentPlayer = safePlayers.findIndex(p => p.id === player.id) === currentPlayerIndex;
-            const isLeader = index === 0;
+          {safePlayers.map((player, index) => {
+            const isCurrentPlayer = index === currentPlayerIndex;
+            const isLeader = player.score > 0 && safePlayers.every(p => p.score <= player.score);
             
             return (
               <View
@@ -27,7 +26,6 @@ export function PlayerScores({ players, currentPlayerIndex }: PlayerScoresProps)
                 style={[
                   styles.playerCard,
                   isCurrentPlayer && styles.currentPlayerCard,
-                  isLeader && styles.leaderCard,
                 ]}
               >
                 <View style={styles.playerHeader}>
@@ -40,7 +38,7 @@ export function PlayerScores({ players, currentPlayerIndex }: PlayerScoresProps)
                   )}
                 </View>
                 <Text style={styles.playerScore}>{player.score} pts</Text>
-                {isLeader && player.score > 0 && (
+                {isLeader && (
                   <View style={styles.leaderBadge}>
                     <FontAwesome5 name="crown" size={10} color="#FFD700" />
                   </View>
@@ -88,10 +86,6 @@ const styles = StyleSheet.create({
   currentPlayerCard: {
     borderColor: '#2E7D32',
     backgroundColor: '#e8f5e8',
-  },
-  leaderCard: {
-    backgroundColor: '#fff3cd',
-    borderColor: '#ffc107',
   },
   playerHeader: {
     flexDirection: 'row',
