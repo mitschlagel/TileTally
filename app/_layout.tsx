@@ -5,7 +5,7 @@ import React from 'react';
 export default function RootLayout() {
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style="light" backgroundColor="#ffffff" translucent={false} />
       <Stack>
         <Stack.Screen
           name="index"

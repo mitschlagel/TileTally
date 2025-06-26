@@ -2,7 +2,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
-    FlatList,
     Modal,
     ScrollView,
     StyleSheet,
@@ -20,7 +19,6 @@ import { calculateTurnScore, generateTurnId, getNextPlayerIndex, updatePlayerSco
 
 export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const { games, saveGame } = useGameStorage();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
