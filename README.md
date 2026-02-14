@@ -1,5 +1,7 @@
 # TileTally 🎯
 
+This app ships: [TileTally on Apple App Store](https://apps.apple.com/us/app/tiletally/id6478087140)
+
 A React Native app built with Expo for tracking and scoring word games with multiple players. Keep track of your games, calculate scores with multipliers, and maintain a history of all your matches.
 
 ## Features
